@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="@string/role_admin"
+       android:id="@+id/extendAdmin"
+        android:icon="@drawable/ic_account_circle_24px"
+        app:showAsAction="always"/>
+    <item android:title="@string/search"
+        android:icon="@drawable/ic_search_24px"
+        android:id="@+id/extendSearch"
+        app:showAsAction="always"/>
+</menu>

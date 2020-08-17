@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+     <item android:id="@+id/openCamera"
+         android:title="@string/take_a_photo"/>
+    <item android:title="@string/photos"
+        android:id="@+id/openPhotos"/>
+</menu>
