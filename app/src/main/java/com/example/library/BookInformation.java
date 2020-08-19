@@ -32,7 +32,6 @@ public class BookInformation extends AppCompatActivity {
     ArrayList<BookDetail> data= new ArrayList<>();;
     TextView txtBookName;
     String bookCode;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,17 +40,11 @@ public class BookInformation extends AppCompatActivity {
         setupViews();
         queryDataFromFireBase(bookCode);
     }
-
     private void setupViews() {
         Intent intent = getIntent();
         bookCode  = intent.getStringExtra("valueItem");
-
     }
     private void setDataToViews(ArrayList<BookDetail> item){
-
-
-
-
         String bookName = item.get(0).getBookName();
         String author = item.get(0).getAuthorCode();
         String category = item.get(0).getCategory();
@@ -104,7 +97,6 @@ public class BookInformation extends AppCompatActivity {
         });
         dialog.show();
     }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
@@ -116,33 +108,20 @@ public class BookInformation extends AppCompatActivity {
     }
     private  void queryDataFromFireBase(final String bookCode){
         final FirebaseDatabase database = FirebaseDatabase.getInstance("https://library-80e61.firebaseio.com/");
-        DatabaseReference reference = database.getReference("Books");
-        reference.addChildEventListener(new ChildEventListener() {
+        DatabaseReference reference = database.getReference();
+        Query allCatePost = reference.child("Books").orderByChild("bookCode").equalTo(bookCode);
+        allCatePost.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                BookDetail bookDetail = snapshot.getValue(BookDetail.class);
-               if (bookDetail.getBookCode().equals(bookCode.trim())){
-                   Log.d("Vinh", bookDetail.getBookName()+"");
-                   data.add(new BookDetail(bookDetail.getBookName(), bookDetail.getAuthorCode(), bookDetail.getNation(), bookDetail.getLanguage(), bookDetail.getBookCode(), bookDetail.getCategory(), bookDetail.getPublish(), bookDetail.getPublicationDate(), bookDetail.getNumberOfPages(), bookDetail.getIntroduce(), bookDetail.getCoverImage()));
-                   setDataToViews(data);
-               }
-            }
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-            }
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-            }
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    BookDetail bookDetail = dataSnapshot.getValue(BookDetail.class);
+                    data.add(bookDetail);
+                    setDataToViews(data);
+                }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-
-
-
-
     }
 }
