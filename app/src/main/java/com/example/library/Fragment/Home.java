@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.BookDetail;
 import com.example.library.BookInformation;
-import com.example.library.LibraryAdpter;
+import com.example.library.LibraryAdapterSearch;
 import com.example.library.R;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -25,13 +25,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
-public class Home extends Fragment implements LibraryAdpter.Callback {
+public class Home extends Fragment implements LibraryAdapterSearch.Callback {
     View view;
    public static ArrayList<BookDetail> bookList;
-  public  static   LibraryAdpter libraryAdpter;
-   LibraryAdpter.Callback callback;
+  public  static LibraryAdapterSearch libraryAdapterSearch;
+   LibraryAdapterSearch.Callback callback;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,14 +46,14 @@ public class Home extends Fragment implements LibraryAdpter.Callback {
         layoutManager.setOrientation(RecyclerView.HORIZONTAL);
         layoutManager.scrollToPosition(0);
         recyclerViewFavourite.setLayoutManager(layoutManager);
-        libraryAdpter = new LibraryAdpter(bookList, this);
-        recyclerViewFavourite.setAdapter(libraryAdpter);
+        libraryAdapterSearch = new LibraryAdapterSearch(bookList, this);
+        recyclerViewFavourite.setAdapter(libraryAdapterSearch);
         // recyclerView New
         RecyclerView recyclerViewBookNew = view.findViewById(R.id.recyclerViewBookNew);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         recyclerViewBookNew.setLayoutManager(gridLayoutManager);
-        libraryAdpter = new LibraryAdpter(bookList, this);
-        recyclerViewBookNew.setAdapter(libraryAdpter);
+        libraryAdapterSearch = new LibraryAdapterSearch(bookList, this);
+        recyclerViewBookNew.setAdapter(libraryAdapterSearch);
 
 
     }
@@ -68,7 +67,7 @@ public class Home extends Fragment implements LibraryAdpter.Callback {
                 BookDetail bookDetail = snapshot.getValue(BookDetail.class);
                 bookList.add(new BookDetail(bookDetail.getBookName(), bookDetail.getAuthorCode(), bookDetail.getNation(), bookDetail.getLanguage(), bookDetail.getBookCode(), bookDetail.getCategory(), bookDetail.getPublish(), bookDetail.getPublicationDate(), bookDetail.getNumberOfPages(), bookDetail.getIntroduce(), bookDetail.getCoverImage()));
 //                bookList.addAll((Collection<? extends BookDetail>) bookDetail);
-                libraryAdpter.notifyDataSetChanged();
+                libraryAdapterSearch.notifyDataSetChanged();
             }
 
             @Override

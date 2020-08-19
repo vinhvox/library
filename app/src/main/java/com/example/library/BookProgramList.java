@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
@@ -18,14 +19,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class BookProgramList extends AppCompatActivity implements LibraryAdpter.Callback {
+public class BookProgramList extends AppCompatActivity implements LibraryAdapterSearch.Callback {
     ArrayList<BookDetail> bookList;
-    LibraryAdpter adpter;
+    LibraryAdapterSearch adpter;
     RecyclerView recyclerView;
-    LibraryAdpter.Callback callback;
+    LibraryAdapterSearch.Callback callback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -40,7 +42,7 @@ public class BookProgramList extends AppCompatActivity implements LibraryAdpter.
         recyclerView = findViewById(R.id.recyclerViewBookProgramList);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(layoutManager);
-        adpter = new LibraryAdpter(bookList, this);
+        adpter = new LibraryAdapterSearch(bookList, this);
         recyclerView.setAdapter(adpter);
     }
 //    private  void  createDummyData(){
@@ -60,38 +62,54 @@ public class BookProgramList extends AppCompatActivity implements LibraryAdpter.
 //    }
 private  void  createDummyData(){
     bookList = new ArrayList<>();
-    FirebaseDatabase database = FirebaseDatabase.getInstance("https://library-80e61.firebaseio.com/");
+    final FirebaseDatabase database = FirebaseDatabase.getInstance("https://library-80e61.firebaseio.com/");
     DatabaseReference myRef = database.getReference("Books");
-    myRef.addChildEventListener(new ChildEventListener() {
+    myRef.addValueEventListener(new ValueEventListener() {
         @Override
-        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-            BookDetail bookDetail = snapshot.getValue(BookDetail.class);
-            bookList.add(new BookDetail(bookDetail.getBookName(), bookDetail.getAuthorCode(), bookDetail.getNation(), bookDetail.getLanguage(), bookDetail.getBookCode(), bookDetail.getCategory(), bookDetail.getPublish(), bookDetail.getPublicationDate(), bookDetail.getNumberOfPages(), bookDetail.getIntroduce(), bookDetail.getCoverImage()));
-//                bookList.addAll((Collection<? extends BookDetail>) bookDetail);
-            adpter.notifyDataSetChanged();
-        }
-
-        @Override
-        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-        }
-
-        @Override
-        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+          for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+              BookDetail item = dataSnapshot.getValue(BookDetail.class);
+              bookList.add(item);
+              adpter.updateData(bookList);
+          }
         }
 
         @Override
         public void onCancelled(@NonNull DatabaseError error) {
 
         }
-
     });
+
+
+//    myRef.addChildEventListener(new ChildEventListener() {
+//        @Override
+//        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//            BookDetail bookDetail = snapshot.getValue(BookDetail.class);
+//            bookList.add(new BookDetail(bookDetail.getBookName(), bookDetail.getAuthorCode(), bookDetail.getNation(), bookDetail.getLanguage(), bookDetail.getBookCode(), bookDetail.getCategory(), bookDetail.getPublish(), bookDetail.getPublicationDate(), bookDetail.getNumberOfPages(), bookDetail.getIntroduce(), bookDetail.getCoverImage()));
+//
+//        }
+//
+//        @Override
+//        public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//
+//        }
+//
+//        @Override
+//        public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+//
+//        }
+//
+//        @Override
+//        public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//
+//        }
+//
+//        @Override
+//        public void onCancelled(@NonNull DatabaseError error) {
+//
+//        }
+//
+//    });
 //        bookList = new ArrayList<>();
 //        bookList.add(new BookDetail("vinh","vinh","skjdk", "kajsa","akjsak", "akjsa", "kajsak", "sodk",1,"Đắc nhân tâm – How to win friends and Influence People  của Dale Carnegie là quyển sách nổi tiếng nhất, bán chạy nhất và có tầm ảnh hưởng nhất của mọi thời đại. Tác phẩm đã được chuyển ngữ sang hầu hết các thứ tiếng trên thế giới và có mặt ở hàng trăm quốc gia. \n" +
 //                "\n" +

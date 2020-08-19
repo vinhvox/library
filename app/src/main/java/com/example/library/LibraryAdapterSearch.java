@@ -1,13 +1,11 @@
 package com.example.library;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,16 +16,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class LibraryAdpter extends RecyclerView.Adapter< LibraryAdpter.ViewHolder> implements Filterable {
+public class LibraryAdapterSearch extends RecyclerView.Adapter< LibraryAdapterSearch.ViewHolder> implements Filterable {
     List<BookDetail> bookList;
     List<BookDetail> bookDetailsFilter;
     Callback callback;
 
-    public LibraryAdpter(List<BookDetail> bookList, Callback callback) {
+    public LibraryAdapterSearch(List<BookDetail> bookList, Callback callback) {
         this.bookList = bookList;
         this.callback = callback;
         this.bookDetailsFilter = new ArrayList<>(bookList);
     };
+
+    public void updateData(List<BookDetail> bookList){
+        this.bookList = bookList;
+        this.bookDetailsFilter = new ArrayList<>(bookList);
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
@@ -52,13 +56,13 @@ public class LibraryAdpter extends RecyclerView.Adapter< LibraryAdpter.ViewHolde
 
     }
     public  void  inflateDataToView(View view, int position){
-        BookDetail bookDetail = bookList.get(position);
+        BookDetail bookDetail = bookDetailsFilter.get(position);
         ImageView coverImage = view.findViewById(R.id.coverImage);
         Picasso.get().load(bookDetail.getCoverImage()).into(coverImage);
     }
     @Override
     public int getItemCount() {
-        return bookList.size();
+        return bookDetailsFilter.size();
     }
 
     @Override
@@ -71,9 +75,9 @@ public class LibraryAdpter extends RecyclerView.Adapter< LibraryAdpter.ViewHolde
 
             List<BookDetail> filterList = new ArrayList<>();
             if (charSequence.toString().trim().isEmpty()){
-                filterList.addAll(bookDetailsFilter);
+                filterList.addAll(bookList);
             }else {
-                for (BookDetail bookDetail : bookDetailsFilter){
+                for (BookDetail bookDetail : bookList){
                     if (bookDetail.getBookCode().toLowerCase().contains(charSequence.toString().trim().toLowerCase())){
                         filterList.add(bookDetail);
                     }
@@ -86,10 +90,9 @@ public class LibraryAdpter extends RecyclerView.Adapter< LibraryAdpter.ViewHolde
         }
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-           bookList.clear();
-           bookList.addAll((Collection<? extends BookDetail>) filterResults.values);
+           bookDetailsFilter.clear();
+           bookDetailsFilter.addAll((Collection<? extends BookDetail>) filterResults.values);
             notifyDataSetChanged();
-
         }
     };
 
