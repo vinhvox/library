@@ -8,20 +8,45 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.example.library.BookProgramList;
 import com.example.library.R;
 
 public class Search extends Fragment {
+    View view;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
+        view = inflater.inflate(R.layout.fragment_search, container, false);
+        setupViews();
         return  view;
+    }
+
+    private void setupViews() {
+        CardView cardViewKinhDaonh = view.findViewById(R.id.carbViewSearchBusiness);
+        CardView cardViewChild = view.findViewById(R.id.cardViewsChild);
+        cardViewKinhDaonh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TextView txtDanhMuc = view.findViewById(R.id.txtBusiness);
+                String danhmuc = txtDanhMuc.getText().toString();
+                Intent intent = new Intent(getContext(), BookProgramList.class);
+                intent.putExtra("category", danhmuc);
+                startActivity(intent);
+            }
+        });
+        cardViewChild.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TextView txtDanhMuc =  view.findViewById(R.id.txtChild);
+            }
+        });
     }
 
     @Override
@@ -41,7 +66,9 @@ public class Search extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.extendSearch:
-                startActivity(new Intent( getContext(), BookProgramList.class));
+                Intent intent = new Intent(getContext(), BookProgramList.class);
+                intent.putExtra("category", "all");
+                startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }

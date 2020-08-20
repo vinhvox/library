@@ -34,14 +34,19 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class MoreBooks extends AppCompatActivity {
@@ -49,12 +54,15 @@ public class MoreBooks extends AppCompatActivity {
     private static final int PERMISSION_CODE_GALLERY = 1100 ;
     private int REQUEST_CODE_PICK_CAPTURE = 1111;
     private  int REQUEST_CODE_CAMERA_CAPTURE= 1112;
+    EditText edtBookName,  edtAuthorCode, edtBookNation, edtBookLanguage, edtBookCode, edtPublishingCompanyCode, edtIntro, edtDateOfPublication, edtNumbersOfPage;
     ImageView imageBookCreate;
     Spinner spinnerCategory;
     String spinnerItem;
     Uri imageUri ;
     Uri uriDownload;
     ProgressDialog progressDialog;
+    String dateCreate;
+    ArrayList<BookDetail> bookDetails;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,9 +70,7 @@ public class MoreBooks extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         popupMenuImage();
         setDataToSpinner();
-
-
-
+        getDateCreate();
     }
     private void setDataToSpinner(){
         final ArrayList<String> dataSpinner = new ArrayList<>();
@@ -96,15 +102,15 @@ public class MoreBooks extends AppCompatActivity {
        progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Up load to Firebase...");
         //innit
-        EditText edtBookName = findViewById(R.id.edtBookName);
-        EditText edtAuthorCode = findViewById(R.id.edtAthorCode);
-        EditText edtBookNation = findViewById(R.id.edtBookNation);
-        EditText edtBookLanguage = findViewById(R.id.edtBookLaguage);
-        EditText edtBookCode = findViewById(R.id.edtBookCode);
-        EditText edtPublishingCompanyCode = findViewById(R.id.edtPublishingCompanyCode);
-        EditText edtIntro = findViewById(R.id.edtIntroBook);
-        EditText edtDateOfPublication = findViewById(R.id.edtDateOfPublication);
-        EditText edtNumbersOfPage = findViewById(R.id.edtNumbersOfPage);
+        edtBookName = findViewById(R.id.edtBookName);
+        edtAuthorCode = findViewById(R.id.edtAthorCode);
+        edtBookNation = findViewById(R.id.edtBookNation);
+        edtBookLanguage = findViewById(R.id.edtBookLaguage);
+        edtBookCode = findViewById(R.id.edtBookCode);
+        edtPublishingCompanyCode = findViewById(R.id.edtPublishingCompanyCode);
+        edtIntro = findViewById(R.id.edtIntroBook);
+        edtDateOfPublication = findViewById(R.id.edtDateOfPublication);
+        edtNumbersOfPage = findViewById(R.id.edtNumbersOfPage);
         //get data
         String bookName = edtBookName.getText().toString().trim();
         String authorCode = edtAuthorCode.getText().toString().trim();
@@ -119,15 +125,49 @@ public class MoreBooks extends AppCompatActivity {
         if (bookName.isEmpty() || authorCode.isEmpty() || bookNation.isEmpty()|| bookLanguage.isEmpty()|| bookCode.isEmpty()|| publishingCompanyCode.isEmpty() || intro.isEmpty() || dateOfPublication.isEmpty() || numbersOfPage.isEmpty() ){
             Toast.makeText(MoreBooks.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_LONG).show();
         }
+
         else {
-            progressDialog.show();
-//            Toast.makeText(MoreBooks.this, t+"", Toast.LENGTH_LONG).show();
-        saveImageToStorageAndDownloadUri(bookName, authorCode, bookNation, bookLanguage, bookCode, spinnerItem, publishingCompanyCode, dateOfPublication,Integer.parseInt(numbersOfPage) , intro);
+
+
+            checkBookCode(bookName, authorCode, bookNation, bookLanguage, bookCode, spinnerItem, publishingCompanyCode, dateOfPublication,Integer.parseInt(numbersOfPage) , intro);
+
         }
 
     }
+    private void checkBookCode(final String bookName, final String authorCode, final String bookNation, final String  bookLanguage, final String bookCode, final String spinnerItem, final String publishingCompanyCode, final String dateOfPublication, final int numbersOfPage , final String intro){
+     bookDetails    = new ArrayList<>();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance("https://library-80e61.firebaseio.com/");
+        Query query = database.getReference("Books").orderByChild("bookCode").equalTo(bookCode);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+              if (snapshot.exists()){
+                 Toast.makeText(MoreBooks.this, "exists", Toast.LENGTH_LONG).show();
+                 edtBookCode.setError("Book code exists!");
+              }
+              else {
+                  progressDialog.show();
+                  saveImageToStorageAndDownloadUri(bookName, authorCode, bookNation, bookLanguage, bookCode, spinnerItem, publishingCompanyCode, dateOfPublication,numbersOfPage , intro);
+              }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    };
+    private void emptyEditText(){
+        edtBookName.setText("");
+        edtAuthorCode.setText("");
+        edtBookNation.setText("");
+        edtBookLanguage.setText("");
+        edtBookCode.setText("");
+        edtPublishingCompanyCode.setText("");
+        edtIntro.setText("");
+        edtDateOfPublication.setText("");
+        edtNumbersOfPage.setText("");
+    }
     private void addDataToFireBaseDataBase(String bookName, String authorCode,String bookNation, String  bookLanguage, String bookCode,String spinnerItem, String publishingCompanyCode, String dateOfPublication, int numbersOfPage , String intro, String uriImage){
-        BookDetail bookDetail= new BookDetail(bookName, authorCode, bookNation, bookLanguage, bookCode, spinnerItem,  publishingCompanyCode, dateOfPublication, numbersOfPage, intro,uriImage);
+        BookDetail bookDetail= new BookDetail(bookName, authorCode, bookNation, bookLanguage, bookCode, spinnerItem,  publishingCompanyCode, dateOfPublication, numbersOfPage, intro,uriImage, 0, dateCreate);
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://library-80e61.firebaseio.com/");
         DatabaseReference myRef = database.getReference("Books");
         myRef.child(bookCode).setValue(bookDetail).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -136,6 +176,7 @@ public class MoreBooks extends AppCompatActivity {
                 if (task.isSuccessful()){
                     progressDialog.dismiss();
                     Toast.makeText(MoreBooks.this, "Save data FireBase success", Toast.LENGTH_LONG).show();
+                    emptyEditText();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -217,7 +258,6 @@ public class MoreBooks extends AppCompatActivity {
             }
         });
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_save, menu);
@@ -228,16 +268,13 @@ public class MoreBooks extends AppCompatActivity {
            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
            || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
                String[] permission = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-               //show popup to request permission
                requestPermissions(permission, PERMISSION_CODE);
            }
            else {
-               //permission already granted
                openCamera();
            }
        }
        else {
-           // system os < marshmallow
            openCamera();
        }
     }
@@ -269,7 +306,6 @@ public class MoreBooks extends AppCompatActivity {
         intentPickGallery.setType("image/*");
         startActivityForResult(intentPickGallery, REQUEST_CODE_PICK_CAPTURE);
     }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()) {
@@ -313,5 +349,12 @@ public class MoreBooks extends AppCompatActivity {
             imageUri = data.getData();
             imageBookCreate.setImageURI(imageUri);
         }
+    }
+    private void getDateCreate(){
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        dateCreate = day+"/"+month+"/"+year;
     }
 }

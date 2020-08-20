@@ -12,11 +12,13 @@ public class BookDetail {
     int numberOfPages;
     String introduce;
     String coverImage;
+    int currentViews;
+    String dateCreate;
 
     public BookDetail() {
     }
 
-    public BookDetail(String bookName, String authorCode, String nation, String language, String bookCode, String category, String publish, String publicationDate, int numberOfPages, String introduce, String coverImage) {
+    public BookDetail(String bookName, String authorCode, String nation, String language, String bookCode, String category, String publish, String publicationDate, int numberOfPages, String introduce, String coverImage, int currentViews, String dateCreate) {
         this.bookName = bookName;
         this.authorCode = authorCode;
         this.nation = nation;
@@ -28,6 +30,8 @@ public class BookDetail {
         this.numberOfPages = numberOfPages;
         this.introduce = introduce;
         this.coverImage = coverImage;
+        this.currentViews = currentViews;
+        this.dateCreate = dateCreate;
     }
 
     public String getBookName() {
@@ -116,5 +120,21 @@ public class BookDetail {
 
     public void setCoverImage(String coverImage) {
         this.coverImage = coverImage;
+    }
+
+    public int getCurrentViews() {
+        return currentViews;
+    }
+
+    public void setCurrentViews(int currentViews) {
+        this.currentViews = currentViews;
+    }
+
+    public String getDateCreate() {
+        return dateCreate;
+    }
+
+    public void setDateCreate(String dateCreate) {
+        this.dateCreate = dateCreate;
     }
 }

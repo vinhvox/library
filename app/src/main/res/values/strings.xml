@@ -83,6 +83,8 @@
     <string name="pseudonym">Bút danh</string>
    <string name="author_code">Mã tác giả</string>
     <string name="artwork">Tác phẩm</string>
+    <string name="noData">No Data</string>
+    <string name="seeMore">Xem thêm</string>
 
 
 </resources>

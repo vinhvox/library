@@ -3,14 +3,11 @@ package com.example.library.Admin;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,7 +25,6 @@ import android.widget.Toast;
 
 import com.example.library.R;
 
-import java.security.Permission;
 import java.util.ArrayList;
 
 public class AddCustomerAccounts extends AppCompatActivity {
@@ -41,7 +37,7 @@ public class AddCustomerAccounts extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_customer_accounts);
+        setContentView(R.layout.activity_add_customer);
         setupViews();
         getDataFromViews();
         popupMenuImage();

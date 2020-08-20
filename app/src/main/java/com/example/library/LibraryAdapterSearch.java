@@ -78,7 +78,7 @@ public class LibraryAdapterSearch extends RecyclerView.Adapter< LibraryAdapterSe
                 filterList.addAll(bookList);
             }else {
                 for (BookDetail bookDetail : bookList){
-                    if (bookDetail.getBookCode().toLowerCase().contains(charSequence.toString().trim().toLowerCase())){
+                    if (bookDetail.getBookName().toLowerCase().contains(charSequence.toString().trim().toLowerCase())){
                         filterList.add(bookDetail);
                     }
                 }
